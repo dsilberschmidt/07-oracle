@@ -72,7 +72,7 @@ describe('OracleExample', () => {
               "apiKey": "22f2ac92-064f-4d47-904c-d2831faffcac",  // not working random_key from .env
               "n": 1,
               "min": 1,
-              "max": 50000,
+              "max": 50,
               "replacement": true
           },
           "id": 1
@@ -86,13 +86,13 @@ describe('OracleExample', () => {
       console.log("number: ",result_json.result.random.data[0])
      
       const id = Field(1);
-      const creditScore = Field(787);
+      const randomNumber = Field(787);
       const signature = Signature.fromBase58(
         '7mXGPCbSJUiYgZnGioezZm7GCy46CEUbgcCH9nrJYXQQiwwVrA5wemBX4T1XFHUw62oR2324QNnkUVXW6yYQLsPsqxZ3nsYR'
       );
       
       const txn = await Mina.transaction(senderAccount, () => {
-          zkApp.verify(id, creditScore, signature);
+          zkApp.verify(id, randomNumber, signature);
       });
 
       
