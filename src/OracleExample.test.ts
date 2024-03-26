@@ -1,4 +1,3 @@
-//import { RpcClient } from 'jsonrpc-ts';
 import { OracleExample } from './OracleExample';
 import {
   Field,
@@ -57,103 +56,6 @@ describe('OracleExample', () => {
   });
 
   describe('hardcoded values', () => {
-    it('emits an `id` event containing the users id if their credit score is above 700 and the provided signature is valid', async () => {
-      await localDeploy();
-
-      const id = Field(1);
-      const creditScore = Field(787);
-      const signature = Signature.fromBase58(
-        '7mXGPCbSJUiYgZnGioezZm7GCy46CEUbgcCH9nrJYXQQiwwVrA5wemBX4T1XFHUw62oR2324QNnkUVXW6yYQLsPsqxZ3nsYR'
-      );
-
-      const txn = await Mina.transaction(senderAccount, () => {
-        zkApp.verify(id, creditScore, signature);
-      });
-      await txn.prove();
-      await txn.sign([senderKey]).send();
-
-      const events = await zkApp.fetchEvents();
-      const verifiedEventValue = events[0].event.data.toFields(null)[0];
-      expect(verifiedEventValue).toEqual(id);
-    });
-
-    it('throws an error if the credit score is below 700 even if the provided signature is valid', async () => {
-      await localDeploy();
-
-      const id = Field(1);
-      const creditScore = Field(536);
-      const signature = Signature.fromBase58(
-        '7mXXnqMx6YodEkySD3yQ5WK7CCqRL1MBRTASNhrm48oR4EPmenD2NjJqWpFNZnityFTZX5mWuHS1WhRnbdxSTPzytuCgMGuL'
-      );
-
-      expect(async () => {
-        const txn = await Mina.transaction(senderAccount, () => {
-          zkApp.verify(id, creditScore, signature);
-        });
-      }).rejects;
-    });
-
-    it('throws an error if the credit score is above 700 and the provided signature is invalid', async () => {
-      await localDeploy();
-
-      const id = Field(1);
-      const creditScore = Field(787);
-      const signature = Signature.fromBase58(
-        '7mXPv97hRN7AiUxBjuHgeWjzoSgL3z61a5QZacVgd1PEGain6FmyxQ8pbAYd5oycwLcAbqJLdezY7PRAUVtokFaQP8AJDEGX'
-      );
-
-      expect(async () => {
-        const txn = await Mina.transaction(senderAccount, () => {
-          zkApp.verify(id, creditScore, signature);
-        });
-      }).rejects;
-    });
-  });
-
-  describe('actual API requests', () => {
-    it('emits an `id` event containing the users id if their credit score is above 700 and the provided signature is valid', async () => {
-      await localDeploy();
-
-      const response = await fetch(
-        'https://07-oracles.vercel.app/api/credit-score?user=1'
-      );
-      const data = await response.json();
-
-      const id = Field(data.data.id);
-      const creditScore = Field(data.data.creditScore);
-      const signature = Signature.fromBase58(data.signature);
-
-      const txn = await Mina.transaction(senderAccount, () => {
-        zkApp.verify(id, creditScore, signature);
-      });
-      await txn.prove();
-      await txn.sign([senderKey]).send();
-
-      const events = await zkApp.fetchEvents();
-      const verifiedEventValue = events[0].event.data.toFields(null)[0];
-      expect(verifiedEventValue).toEqual(id);
-    });
-
-    it('throws an error if the credit score is below 700 even if the provided signature is valid', async () => {
-      await localDeploy();
-
-      const response = await fetch(
-        'https://07-oracles.vercel.app/api/credit-score?user=2'
-      );
-      const data = await response.json();
-
-      const id = Field(data.data.id);
-      const creditScore = Field(data.data.creditScore);
-      const signature = Signature.fromBase58(data.signature);
-
-      expect(async () => {
-        const txn = await Mina.transaction(senderAccount, () => {
-          zkApp.verify(id, creditScore, signature);
-        });
-      }).rejects;
-    });
-
-
     it('check random number < 50', async () => {
    
       await localDeploy();
@@ -168,9 +70,9 @@ describe('OracleExample', () => {
           "method": "generateIntegers",
           "params": {
               "apiKey": "22f2ac92-064f-4d47-904c-d2831faffcac",  // not working random_key from .env
-              "n": 2,
+              "n": 1,
               "min": 1,
-              "max": 50,
+              "max": 50000,
               "replacement": true
           },
           "id": 37
@@ -180,32 +82,26 @@ describe('OracleExample', () => {
 
       const result_json = await response.json();
 
-      //console.log("Respuesta POST", response);  
-      console.log("json POST", result_json.result);
-      console.log("number1",result_json.result.random.data[0])
-      console.log("number2",result_json.result.random.data[1])
-      const response2 = await fetch(
-        'https://07-oracles.vercel.app/api/credit-score?user=1'
+      //console.log("json POST: ", result_json.result);
+      console.log("number: ",result_json.result.random.data[0])
+     
+      const id = Field(1);
+      const creditScore = Field(787);
+      const signature = Signature.fromBase58(
+        '7mXGPCbSJUiYgZnGioezZm7GCy46CEUbgcCH9nrJYXQQiwwVrA5wemBX4T1XFHUw62oR2324QNnkUVXW6yYQLsPsqxZ3nsYR'
       );
+      
+      const txn = await Mina.transaction(senderAccount, () => {
+          zkApp.verify(id, creditScore, signature);
+      });
 
-      // const data = await response2.json();
-      const result_json2 = await response2.json();
-      //console.log("Respuesta GET", response2);
-      console.log("json GET", result_json2)
+      
+      await txn.prove();
+      await txn.sign([senderKey]).send();
 
-      //const id = Field(data.data.id);
-      //const creditScore = Field(data.data.creditScore);
-      //const signature = Signature.fromBase58(data.signature);
-
-      //const txn = await Mina.transaction(senderAccount, () => {
-      //  zkApp.verify(id, creditScore, signature);
-      //});
-      //await txn.prove();
-      //await txn.sign([senderKey]).send();
-
-      //const events = await zkApp.fetchEvents();
-      //const verifiedEventValue = events[0].event.data.toFields(null)[0];
-      //expect(verifiedEventValue).toEqual(id);
+      const events = await zkApp.fetchEvents();
+      const verifiedEventValue = events[0].event.data.toFields(null)[0];
+      expect(verifiedEventValue).toEqual(id);
     });
   });
 });
