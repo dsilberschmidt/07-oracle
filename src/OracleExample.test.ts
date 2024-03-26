@@ -1,3 +1,4 @@
+//import { RpcClient } from 'jsonrpc-ts';
 import { OracleExample } from './OracleExample';
 import {
   Field,
@@ -150,6 +151,61 @@ describe('OracleExample', () => {
           zkApp.verify(id, creditScore, signature);
         });
       }).rejects;
+    });
+
+
+    it('check random number < 50', async () => {
+   
+      await localDeploy();
+
+      const response = await fetch('https://api.random.org/json-rpc/1/invoke', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "jsonrpc": "2.0",
+          "method": "generateIntegers",
+          "params": {
+              "apiKey": "22f2ac92-064f-4d47-904c-d2831faffcac",  // not working random_key from .env
+              "n": 2,
+              "min": 1,
+              "max": 50,
+              "replacement": true
+          },
+          "id": 37
+        })
+      });
+      
+
+      const result_json = await response.json();
+
+      //console.log("Respuesta POST", response);  
+      console.log("json POST", result_json.result);
+      console.log("number1",result_json.result.random.data[0])
+      console.log("number2",result_json.result.random.data[1])
+      const response2 = await fetch(
+        'https://07-oracles.vercel.app/api/credit-score?user=1'
+      );
+
+      // const data = await response2.json();
+      const result_json2 = await response2.json();
+      //console.log("Respuesta GET", response2);
+      console.log("json GET", result_json2)
+
+      //const id = Field(data.data.id);
+      //const creditScore = Field(data.data.creditScore);
+      //const signature = Signature.fromBase58(data.signature);
+
+      //const txn = await Mina.transaction(senderAccount, () => {
+      //  zkApp.verify(id, creditScore, signature);
+      //});
+      //await txn.prove();
+      //await txn.sign([senderKey]).send();
+
+      //const events = await zkApp.fetchEvents();
+      //const verifiedEventValue = events[0].event.data.toFields(null)[0];
+      //expect(verifiedEventValue).toEqual(id);
     });
   });
 });
