@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { OracleExample } from './OracleExample';
 import {
   Field,
@@ -69,7 +70,7 @@ describe('OracleExample', () => {
           "jsonrpc": "2.0",
           "method": "generateIntegers",
           "params": {
-              "apiKey": "22f2ac92-064f-4d47-904c-d2831faffcac",  // not working random_key from .env
+              "apiKey": process.env.random_key,
               "n": 1,
               "min": 1,
               "max": 50,
